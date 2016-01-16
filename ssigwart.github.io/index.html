@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Stephen Sigwart’s Website</title>
+
+    <!-- Bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+			<h1>Birthday Paradox Calculator</h1>
+			
+			<p>
+				This page is a calculator for the Birthday Paradox, also known as the Birthday Problem.
+				You can find out more about the topic on <a href="https://en.wikipedia.org/wiki/Birthday_problem">Wikipedia</a>.
+				This page allows you to calculate the probability that at least 2 people in a group of random people share a birthday.
+				If can also be used to determine similar probabilities, such as the chances that 2 people in a group pick the same random number for 1 to 100.
+			</p>
+			
+			<div class="row">
+				<div class="col-md-3 col-sm-4">
+					<div class="form-group">
+						<label>Number of Picks</label>
+						<input type="number" min="1" class="form-control" id="numPicks" value="23" />
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-4">
+					<div class="form-group">
+						<label>Total Number of Combinations</label>
+						<input type="number" min="1" class="form-control" id="numCombinations" value="365" />
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-4">
+					<div class="form-group">
+						<label>Chance of Duplicate</label>
+						<div>
+							<b><span id="prob"></span></b>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<script>//<![CDATA[
+$(function() {
+	var picksInput = $("#numPicks");
+	var combsInput = $("#numCombinations");
+	var probSpan = $("#prob");
+	var paradoxCalc = function() {
+		var picks = parseInt(picksInput.val(), 10);
+		var combs = parseInt(combsInput.val(), 10);
+		probSpan.text("");
+		if (!isNaN(picks) && !isNaN(combs))
+		{
+			var invProb = 1;
+			if (picks < 2)
+				invProb = 1;
+			else if (picks > combs)
+				invProb = 0;
+			else
+			{
+				for (var i = 1; i < picks; i++)
+					invProb *= (combs-i)/combs;
+			}
+			probSpan.text(((1-invProb)*100).toFixed(3) + "%");
+		}
+	};
+	paradoxCalc();
+	picksInput.add(combsInput).on("change keyup", paradoxCalc);
+});
+		//]]></script>
+  </body>
+</html>
