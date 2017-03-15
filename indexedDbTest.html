@@ -1,0 +1,122 @@
+<html>
+	<body>
+		<h1>Testing IndexedDB Auto-Increment</h1>
+		<script>
+			var output = "";
+			
+			// Database 1 (explicit id)
+			var dbOpen1 = indexedDB.open("Database1", 1);
+			dbOpen1.onupgradeneeded = function() {
+				var store = dbOpen1.result.createObjectStore("Store1", {keyPath: "id"});
+				store.createIndex("SingleKey", "num");
+				store.createIndex("CompoundKey", ["num", "id"]);
+				store.createIndex("CompoundKey2", ["num", "num2"]);
+			};
+			dbOpen1.onsuccess = function() {
+				var db = dbOpen1.result;
+				var tx = db.transaction("Store1", "readwrite");
+				var store = tx.objectStore("Store1");
+				console.log(store.indexNames);
+				
+				// Add data
+				store.put({id: 1, num: 100, num2: 101});
+				store.put({id: 2, num: 200, num2: 201});
+				store.put({id: 3, num: 300, num2: 301});
+				
+				// Test id
+				var q1 = store.get(1);
+				q1.onsuccess = function() {
+					console.log(q1.result);
+					output += "Database 1 - Primary Key: " + (q1.result ? q1.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Test single key
+				var q2 = store.index("SingleKey").get(100);
+				q2.onsuccess = function() {
+					console.log(q2.result);
+					output += "Database 1 - Single Key: " + (q2.result ? q2.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Test compound key
+				var q3 = store.index("CompoundKey").get([100, 1]);
+				q3.onsuccess = function() {
+					console.log(q3.result);
+					output += "Database 1 - Compound Key 1: " + (q3.result ? q3.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Test compound key
+				var q4 = store.index("CompoundKey2").get([100, 101]);
+				q4.onsuccess = function() {
+					console.log(q4.result);
+					output += "Database 1 - Compound Key 2: " + (q4.result ? q4.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Close database
+				tx.oncomplete = function() {
+					db.close();
+				};
+			};
+			
+			// Database 2 (autoincrement)
+			var dbOpen2 = indexedDB.open("Database2", 1);
+			dbOpen2.onupgradeneeded = function() {
+				var store = dbOpen2.result.createObjectStore("Store1", {keyPath: "id", autoIncrement: true});
+				store.createIndex("SingleKey", "num");
+				store.createIndex("CompoundKey", ["num", "id"]);
+				store.createIndex("CompoundKey2", ["num", "num2"]);
+			};
+			dbOpen2.onsuccess = function() {
+				var db = dbOpen2.result;
+				var tx = db.transaction("Store1", "readwrite");
+				var store = tx.objectStore("Store1");
+				console.log(store.indexNames);
+				
+				// Add data
+				store.put({num: 100, num2: 101});
+				store.put({num: 200, num2: 201});
+				store.put({num: 300, num2: 301});
+				
+				// Test id
+				var q1 = store.get(1);
+				q1.onsuccess = function() {
+					console.log(q1.result);
+					output += "Database 2 - Primary Key: " + (q1.result ? q1.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Test single key
+				var q2 = store.index("SingleKey").get(100);
+				q2.onsuccess = function() {
+					console.log(q2.result);
+					output += "Database 2 - Single Key: " + (q2.result ? q2.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Test compound key
+				var q3 = store.index("CompoundKey").get([100, 1]);
+				q3.onsuccess = function() {
+					console.log(q3.result);
+					output += "Database 2 - Compound Key 1: " + (q3.result ? q3.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Test compound key
+				var q4 = store.index("CompoundKey2").get([100, 101]);
+				q4.onsuccess = function() {
+					console.log(q4.result);
+					output += "Database 2 - Compound Key 2: " + (q4.result ? q4.result.num : 'FAILED') + "<br/>";
+					document.body.innerHTML = output;
+				};
+				
+				// Close database
+				tx.oncomplete = function() {
+					db.close();
+				};
+			}
+		</script>
+	</body>
+</html>
